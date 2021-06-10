@@ -1,7 +1,7 @@
 # Experiment config
 weights_dir: ./weights
 experiment_code: 001A
-num_epochs: 1
+num_epochs: 3
 
 # Get dataset and dataloaders
 data:
@@ -9,11 +9,11 @@ data:
   path: ../data/windowed/
   classes: [noIH, IH]
   num_workers: 8
-  batch_size: 32
+  batch_size: 128
 
 # Initialize model
 model:
-  name: resnet34
+  name: resnet18
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: True
   print_model:

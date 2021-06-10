@@ -9,6 +9,7 @@ import time
 import os
 import copy
 import torch.nn.functional as F
+from tqdm import tqdm
 
 def train_model(conf):
     device = conf['device']
@@ -27,10 +28,7 @@ def train_model(conf):
     best_weights = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
-    for epoch in range(num_epochs):
-        print(f'Epoch {epoch+1}/{num_epochs} | LR = {scheduler.get_last_lr()}')
-        print('-' * 10)
-
+    for _ in tqdm(range(num_epochs), desc='Epoch'):
         # Each epoch has a training and validation phase
         for phase in ['train', 'valid']:
             if phase == 'train':
@@ -43,7 +41,7 @@ def train_model(conf):
 
             # Iterate over data.
             n_batches = len(dataloaders[phase])
-            for i, (inputs, labels) in enumerate(dataloaders[phase]):
+            for inputs, labels in tqdm(dataloaders[phase], desc='Batch'):
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -65,7 +63,6 @@ def train_model(conf):
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
-                if (i+1)%(n_batches//3) == 0: print(f'Batch {i+1}/{n_batches}')
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
