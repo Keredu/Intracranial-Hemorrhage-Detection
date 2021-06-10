@@ -2,3 +2,4 @@ data/
 *.pt
 weights/
 __pycache__/
+experiments/
