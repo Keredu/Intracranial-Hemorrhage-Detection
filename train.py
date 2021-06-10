@@ -21,14 +21,11 @@ def train_model(conf):
     num_epochs = conf['num_epochs']
     experiment_dir = conf['experiment_dir']
 
-    since = time.time()
-
     valid_acc_history = []
-
-    best_weights = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
-    for _ in tqdm(range(num_epochs), desc='Epoch'):
+    epoch_bar = tqdm(range(num_epochs), desc='Epoch',unit="epochs")
+    for epoch in epoch_bar:
         # Each epoch has a training and validation phase
         for phase in ['train', 'valid']:
             if phase == 'train':
@@ -41,7 +38,9 @@ def train_model(conf):
 
             # Iterate over data.
             n_batches = len(dataloaders[phase])
-            for inputs, labels in tqdm(dataloaders[phase], desc='Batch'):
+
+            batch_bar = tqdm(dataloaders[phase], desc='Batch',unit="batches", leave=False)
+            for inputs, labels in batch_bar:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -64,10 +63,12 @@ def train_model(conf):
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
+                batch_bar.set_postfix(phase=phase, batch_loss=loss.item())
+
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+        epoch_bar.set_postfix(vloss=epoch_loss, vacc=epoch_acc.item())
 
             # deep copy the model
             if phase == 'valid' and epoch_acc > best_acc:
@@ -80,8 +81,6 @@ def train_model(conf):
                 valid_acc_history.append(epoch_acc)
         scheduler.step()
 
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best valid Acc: {:4f}'.format(best_acc))
 
     # load best model weights
