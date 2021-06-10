@@ -7,8 +7,7 @@ import numpy as np
 from torchvision import transforms
 
 class IHDataset(Dataset):
-    """Face Landmarks dataset."""
-
+    """Intracranial Hemorrhage dataset."""
     def __init__(self, root_dir, stage='train', transform=None):
         self.root_dir = root_dir
         self.stage = stage
@@ -64,7 +63,7 @@ def get_dataloaders(conf):
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                                batch_size=batch_size,
                                                num_workers=num_workers,
-                                               shuffle=True ,
+                                               shuffle=True,
                                                pin_memory=True)
     valid_loader = torch.utils.data.DataLoader(dataset=valid_dataset,
                                                batch_size= batch_size,

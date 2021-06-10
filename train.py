@@ -11,7 +11,7 @@ import copy
 import torch.nn.functional as F
 from tqdm import tqdm
 
-def train_model(conf):
+def train(conf):
     device = conf['device']
     model = conf['model'].to(device)
     dataloaders = conf['dataloaders']
@@ -24,7 +24,7 @@ def train_model(conf):
     valid_acc_history = []
     best_acc = 0.0
 
-    epoch_bar = tqdm(range(num_epochs), desc='Epoch',unit="epochs")
+    epoch_bar = tqdm(range(num_epochs), desc='Epoch',unit='epochs')
     for epoch in epoch_bar:
         # Each epoch has a training and validation phase
         for phase in ['train', 'valid']:
@@ -37,9 +37,10 @@ def train_model(conf):
             running_corrects = 0
 
             # Iterate over data.
-            n_batches = len(dataloaders[phase])
-
-            batch_bar = tqdm(dataloaders[phase], desc='Batch',unit="batches", leave=False)
+            batch_bar = tqdm(dataloaders[phase],
+                             desc='Batch',
+                             unit='batches',
+                             leave=False)
             for inputs, labels in batch_bar:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
@@ -97,5 +98,5 @@ if __name__ == '__main__':
     conf = get_config('training_conf.yaml')
 
     # Train and evaluate
-    model, hist = train_model(conf)
+    model, hist = train(conf)
 

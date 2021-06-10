@@ -26,10 +26,10 @@ def initialize_model(conf):
     num_classes = len(conf['data']['classes'])
 
     if model_name in RESNET:
-            model = getattr(models, model_name)(pretrained=use_pretrained)
-            set_parameter_requires_grad(model, feature_extract)
-            num_ftrs = model.fc.in_features
-            model.fc = nn.Linear(num_ftrs, num_classes)
+        model = getattr(models, model_name)(pretrained=use_pretrained)
+        set_parameter_requires_grad(model, feature_extract)
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, num_classes)
     else:
         print("Invalid model name, exiting...")
         exit()

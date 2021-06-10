@@ -74,7 +74,7 @@ def get_config(yaml_path):
     conf['scheduler'] = get_scheduler(conf)
 
     # Check if GPU is available
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     conf['device'] = device
 
     return conf
