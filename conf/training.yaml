@@ -1,7 +1,8 @@
 # Experiment config
-weights_dir: ./weights
-experiment_code: 001A
-num_epochs: 12
+task: training
+experiments_dir: ./experiments
+experiment_code: R50_001
+num_epochs: 10
 
 # Get dataset and dataloaders
 data:
@@ -9,21 +10,22 @@ data:
   path: ../data/windowed/
   classes: [noIH, IH]
   num_workers: 8
-  batch_size: 128
+  batch_size: 32
 
 # Initialize model
 model:
-  name: resnet18
+  name: resnet50
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: True
-  print_model: True
+  print_model: False
+
 # Get optimizer
 optimizer:
   name: SGD
-  lr: 0.02
+  lr: 0.05
   momentum: 0.9
   weight_decay: 0.001
-  print_params: True
+  print_params: False
 
 # Get criterion
 criterion:
@@ -32,5 +34,5 @@ criterion:
 # Get scheduler
 scheduler:
   name: StepLR
-  step_size: 2
+  step_size: 3
   gamma: 0.5

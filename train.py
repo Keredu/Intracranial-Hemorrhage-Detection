@@ -1,14 +1,6 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import numpy as np
-import torchvision
-from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
-import time
 import os
 import copy
-import torch.nn.functional as F
 from tqdm import tqdm
 
 def train(conf):
@@ -21,10 +13,10 @@ def train(conf):
     num_epochs = conf['num_epochs']
     experiment_dir = conf['experiment_dir']
 
-    valid_acc_history = []
+    #valid_acc_history = []
     best_acc = 0.0
 
-    epoch_bar = tqdm(range(num_epochs), desc='Epoch',unit='epochs')
+    epoch_bar = tqdm(range(num_epochs), desc='Epoch',unit='epoch')
     for epoch in epoch_bar:
         # Each epoch has a training and validation phase
         for phase in ['train', 'valid']:
@@ -39,7 +31,7 @@ def train(conf):
             # Iterate over data.
             batch_bar = tqdm(dataloaders[phase],
                              desc='Batch',
-                             unit='batches',
+                             unit='batch',
                              leave=False)
             for inputs, labels in batch_bar:
                 inputs = inputs.to(device)
@@ -69,34 +61,27 @@ def train(conf):
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
 
-
-            # deep copy the model
             if phase == 'valid' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_weights = copy.deepcopy(model.state_dict())
-                weights_file = f'epoch{epoch}_vacc{best_acc:.3f}_vloss{epoch_loss:.3f}_{model.name}.pt'
+                weights_file = 'best_weights.pt'
                 weights_path = os.path.join(experiment_dir, weights_file)
                 torch.save(best_weights, weights_path)
-            if phase == 'valid':
-                valid_acc_history.append(epoch_acc)
 
         epoch_bar.set_postfix(vloss=epoch_loss, vacc=epoch_acc.item())
         scheduler.step()
 
-    print('Best valid Acc: {:4f}'.format(best_acc))
+    #print('Best valid Acc: {:4f}'.format(best_acc))
 
     # load best model weights
-    model.load_state_dict(best_weights)
-
-    return model, valid_acc_history
-
+    #model.load_state_dict(best_weights)
+#
+    #return model, valid_acc_history
 
 if __name__ == '__main__':
     from config import get_config
-
     # Get config from conf.yaml
-    conf = get_config('training_conf.yaml')
+    conf = get_config('./conf/training.yaml')
 
-    # Train and evaluate
-    model, hist = train(conf)
-
+    # Train model
+    train(conf)
