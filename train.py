@@ -68,7 +68,6 @@ def train_model(conf):
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
 
-        epoch_bar.set_postfix(vloss=epoch_loss, vacc=epoch_acc.item())
 
             # deep copy the model
             if phase == 'valid' and epoch_acc > best_acc:
@@ -79,6 +78,8 @@ def train_model(conf):
                 torch.save(best_weights, weights_path)
             if phase == 'valid':
                 valid_acc_history.append(epoch_acc)
+
+        epoch_bar.set_postfix(vloss=epoch_loss, vacc=epoch_acc.item())
         scheduler.step()
 
     print('Best valid Acc: {:4f}'.format(best_acc))
