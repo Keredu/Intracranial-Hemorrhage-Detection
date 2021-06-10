@@ -93,3 +93,12 @@ def train_model(conf):
     return model, val_acc_history
 
 
+if __name__ == '__main__':
+    from config import get_config
+
+    # Get config from conf.yaml
+    conf = get_config('training_conf.yaml')
+
+    # Train and evaluate
+    model, hist = train_model(conf)
+

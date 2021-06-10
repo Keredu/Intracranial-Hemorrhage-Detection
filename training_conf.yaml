@@ -1,5 +1,3 @@
-
-
 # Experiment config
 weights_dir: ./weights
 experiment_code: 001A
@@ -8,7 +6,7 @@ num_epochs: 1
 # Get dataset and dataloaders
 data:
   name: IHDataset
-  path: ./data/windowed/
+  path: ../data/windowed/
   classes: [noIH, IH]
   num_workers: 8
   batch_size: 32
@@ -18,8 +16,7 @@ model:
   name: resnet34
   feature_extract: False #False, finetune the whole model. True, only update new layer params
 
-
-# Get pptimizer
+# Get optimizer
 optimizer:
   name: SGD
   lr: 0.1

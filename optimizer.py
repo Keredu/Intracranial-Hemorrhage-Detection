@@ -29,4 +29,7 @@ def get_optimizer(conf):
                               lr=lr,
                               momentum=momentum,
                               weight_decay=weight_decay)
+    else:
+        print('Optimizer {optimizer} not supported.')
+        exit()
     return optimizer
