@@ -37,7 +37,7 @@ def get_experiment_dir(conf):
         if not os.path.exists(experiment_dir):
             os.makedirs(experiment_dir)
         else:
-            print(f'Experiment dir {conf["experiment_dir"]} exists.')
+            print(f'Experiment dir {experiment_dir} exists.')
             exit()
     return experiment_dir
 
@@ -45,18 +45,25 @@ def get_config(yaml_path):
     # Load YAML conf
     conf = yaml.safe_load(open(yaml_path, 'r'))
 
-    # Sanity check:
-    if not conf['task'] in ['training', 'evaluation']:
-        print(f'Task {conf["task"]} not supported.')
+    # Task
+    task = conf['task']
+    if task in ['training', 'evaluation']:
+        print(f'Task: {task}')
+    else:
+        print(f'Task {task} not supported.')
         exit()
 
-    # Managing the creation/deletion of directories
-    conf['experiment_dir'] = get_experiment_dir(conf)
+    # Get experiment directory
+    experiment_dir = get_experiment_dir(conf)
+    conf['experiment_dir'] = experiment_dir
+    print(f'Experiment directory: {experiment_dir}')
 
     # Get transforms
     conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
 
     # Get datasets
+    dataset_name = conf['data']['name']
+    print(f'Dataset: {dataset_name}')
     conf['train_dataset'], conf['valid_dataset'] = get_datasets(conf)
 
     # Get dataloaders
@@ -66,23 +73,35 @@ def get_config(yaml_path):
     # Check if GPU is available
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     conf['device'] = device
+    print(f'Device: {device}')
 
     # Initialize model
+    model_name = conf['model']['name']
+    print(f'Model: {model_name}')
     conf['model'] = initialize_model(conf)
 
+    # Only in traning task
     if conf['task'] == 'training':
         # Get optimizer
+        optimizer_name = conf['optimizer']['name']
+        print(f'Optimizer: {optimizer_name}')
         conf['optimizer'] = get_optimizer(conf)
 
         # Get criterion
+        criterion_name = conf['criterion']['name']
+        print(f'Criterion: {criterion_name}')
         conf['criterion'] = get_criterion(conf)
 
         # Get scheduler
+        scheduler_name = conf['scheduler']['name']
+        print(f'Scheduler: {scheduler_name}')
         conf['scheduler'] = get_scheduler(conf)
 
+    # Only in evaluation task
     elif conf['task'] == 'evaluation':
         path = os.path.join(conf['experiment_dir'], 'best_weights.pt')
         if os.path.exists(path):
+            print(f'Loading weights from {path}')
             conf['best_weights'] = torch.load(path)
         else:
             print(f'Experiment weights {path} not found.')
