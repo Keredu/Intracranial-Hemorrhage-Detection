@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import division
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,17 +8,23 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
-
 import torch.nn.functional as F
-from tqdm import tqdm
 
-def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=25):
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+def train_model(conf):
+    device = conf['device']
+    model = conf['model'].to(device)
+    dataloaders = conf['dataloaders']
+    criterion = conf['criterion']
+    optimizer = conf['optimizer']
+    scheduler = conf['scheduler']
+    num_epochs = conf['num_epochs']
+    experiment_dir = conf['experiment_dir']
+
     since = time.time()
 
     val_acc_history = []
 
-    best_model_wts = copy.deepcopy(model.state_dict())
+    best_weights = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
     for epoch in range(num_epochs):
@@ -71,11 +75,12 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(model.state_dict())
-                torch.save(best_model_wts, f'./epoch{epoch}_vacc{best_acc}_vloss{epoch_loss}_IH_resnet_weights.pt')
+                best_weights = copy.deepcopy(model.state_dict())
+                weights_file = f'epoch{epoch}_vacc{best_acc:.3f}_vloss{epoch_loss:.3f}_{model.name}.pt'
+                weights_path = os.path.join(experiment_dir, weights_file)
+                torch.save(best_weights, weights_path)
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
-
         scheduler.step()
 
     time_elapsed = time.time() - since
@@ -83,7 +88,8 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
     print('Best val Acc: {:4f}'.format(best_acc))
 
     # load best model weights
-    model.load_state_dict(best_model_wts)
+    model.load_state_dict(best_weights)
+
     return model, val_acc_history
 
 
