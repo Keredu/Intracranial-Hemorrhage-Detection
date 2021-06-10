@@ -15,7 +15,8 @@ data:
 model:
   name: resnet34
   feature_extract: False #False, finetune the whole model. True, only update new layer params
-
+  use_pretrained: True
+  print_model:
 # Get optimizer
 optimizer:
   name: SGD

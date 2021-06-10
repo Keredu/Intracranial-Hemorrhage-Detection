@@ -22,7 +22,7 @@ def train_model(conf):
 
     since = time.time()
 
-    val_acc_history = []
+    valid_acc_history = []
 
     best_weights = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -32,7 +32,7 @@ def train_model(conf):
         print('-' * 10)
 
         # Each epoch has a training and validation phase
-        for phase in ['train', 'val']:
+        for phase in ['train', 'valid']:
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
@@ -73,24 +73,24 @@ def train_model(conf):
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc:
+            if phase == 'valid' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_weights = copy.deepcopy(model.state_dict())
                 weights_file = f'epoch{epoch}_vacc{best_acc:.3f}_vloss{epoch_loss:.3f}_{model.name}.pt'
                 weights_path = os.path.join(experiment_dir, weights_file)
                 torch.save(best_weights, weights_path)
-            if phase == 'val':
-                val_acc_history.append(epoch_acc)
+            if phase == 'valid':
+                valid_acc_history.append(epoch_acc)
         scheduler.step()
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
+    print('Best valid Acc: {:4f}'.format(best_acc))
 
     # load best model weights
     model.load_state_dict(best_weights)
 
-    return model, val_acc_history
+    return model, valid_acc_history
 
 
 if __name__ == '__main__':
