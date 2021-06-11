@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from tqdm import tqdm
-import os
+
 
 class _BaseWrapper(object):
     def __init__(self, model):
@@ -131,7 +131,7 @@ def get_device(cuda):
         print("Device: CPU")
     return device
 
-'''
+
 def load_images(image_paths):
     images = []
     raw_images = []
@@ -153,15 +153,7 @@ def preprocess(image_path):
         ]
     )(raw_image[..., ::-1].copy())
     return image, raw_image
-'''
 
-def load_images(images):
-    return preprocess(images)
-
-def preprocess(images):
-    inverse_norm = 255 * (0.5 * images + 0.5)
-    raw_images = (inverse_norm).numpy().transpose(0, 2, 3, 1)[..., ::-1]
-    return images, raw_images
 
 def save_gradient(filename, gradient):
     gradient = gradient.cpu().numpy().transpose(1, 2, 0)
@@ -179,15 +171,8 @@ def save_gradcam(filename, gcam, raw_image, paper_cmap=False):
         gcam = alpha * cmap + (1 - alpha) * raw_image
     else:
         gcam = (cmap.astype(np.float) + raw_image.astype(np.float)) / 2
-    #cv2.imwrite(filename, np.uint8(gcam))
-    c0 = raw_image[..., 0]
-    c0 = np.stack((c0, c0, c0), axis=-1)
-    c1 = raw_image[..., 1]
-    c1 = np.stack((c1, c1, c1), axis=-1)
-    c2 = raw_image[..., 0]
-    c2 = np.stack((c2, c2, c2), axis=-1)
-    stack = np.concatenate((gcam, c0, c1, c2, raw_image), axis=1)
-    cv2.imwrite(filename, np.uint8(stack))
+    cv2.imwrite(filename, np.uint8(gcam))
+
 
 def save_sensitivity(filename, maps):
     maps = maps.cpu().numpy()
@@ -200,27 +185,31 @@ def save_sensitivity(filename, maps):
     cv2.imwrite(filename, maps)
 
 
-def gc(model, dataloader, experiment_dir, classes, device):
+def gc(data_path, output_dir, model_trained, classes):
     """
     Visualize model responses given multiple images
     """
+    from glob import glob
+    if data_path[-1] != '/':
+        data_path += '/'
+    data_path += '*'
+    image_paths = glob(data_path)
     arch = ''
     target_layer = 'layer4'
     topk = 1
-    output_dir = os.path.join(experiment_dir, 'Grad_CAM')
-    from shutil import rmtree
-    if os.path.exists(output_dir): rmtree(output_dir)
-    os.makedirs(output_dir)
+    cuda = True
+    device = get_device(cuda)
+
+    # Model from torchvision
+    #model = models.resnet152(pretrained=True)
+    model = model_trained
     model.to(device)
     model.eval()
 
     # Images
-    #images, raw_images = load_images(image_paths)
-    #images = torch.stack(images).to(device)
-    images, labels = next(iter(dataloader))
-    images = images[labels == 1, ...]
-    images, raw_images = load_images(images)
-    images = images.to(device)
+    images, raw_images = load_images(image_paths)
+    images = torch.stack(images).to(device)
+
     """
     Common usage:
     1. Wrap your model with visualization classes defined in grad_cam.py
@@ -239,11 +228,10 @@ def gc(model, dataloader, experiment_dir, classes, device):
         bp.backward(ids=ids[:, [i]])
         gradients = bp.generate()
 
-        '''
         # Save results as image files
         for j in range(len(images)):
             print("\t#{}: {} ({:.5f})".format(j, classes[ids[j, i]], probs[j, i]))
-
+            '''
             save_gradient(
                 filename=osp.join(
                     output_dir,
@@ -251,7 +239,7 @@ def gc(model, dataloader, experiment_dir, classes, device):
                 ),
                 gradient=gradients[j],
             )
-        '''
+            '''
 
     # Remove all the hook function in the "model"
     bp.remove_hook()

@@ -4,11 +4,14 @@ from torch.nn import functional as F
 from metrics import accuracy, roc_auc, pr_auc
 import os
 import yaml
+from grad_cam import gc
+
 
 def evaluate(conf):
     device = conf['device']
     dataloader = conf['dataloaders']['valid']
     experiment_dir = conf['experiment_dir']
+    classes = conf['data']['classes']
 
     model = conf['model']
     model.load_state_dict(conf['best_weights'])
@@ -17,6 +20,7 @@ def evaluate(conf):
 
     ground_truth = None
     inferences = None
+    '''
     batch_bar = tqdm(dataloader, desc='Batch', unit='batches', leave=False)
     for inputs, labels in batch_bar:
         inputs = inputs.to(device)
@@ -46,6 +50,13 @@ def evaluate(conf):
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
         yaml.dump(metrics, fp)
+    '''
+    gc(model=model,
+       dataloader=dataloader,
+       experiment_dir=experiment_dir,
+       classes=classes,
+       device=device)
+
 
 
 if __name__ == '__main__':

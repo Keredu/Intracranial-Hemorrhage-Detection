@@ -2,7 +2,6 @@
 task: evaluation
 experiments_dir: ./experiments
 experiment_code: reunion
-num_epochs: 12
 
 # Get dataset and dataloaders
 data:

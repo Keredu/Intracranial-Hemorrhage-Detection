@@ -68,7 +68,8 @@ def get_dataloaders(conf):
     valid_loader = torch.utils.data.DataLoader(dataset=valid_dataset,
                                                batch_size= batch_size,
                                                num_workers=num_workers,
-                                               shuffle=False,
+                                               #shuffle=False,
+                                               shuffle=True,
                                                pin_memory=True)
     return train_loader, valid_loader
 
