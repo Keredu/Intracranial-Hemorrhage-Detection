@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import torch
 from torch.nn import functional as F
-from metrics import roc_auc, accuracy
+from metrics import accuracy, roc_auc, pr_auc
 import os
 import yaml
 
@@ -38,7 +38,10 @@ def evaluate(conf):
                                     inferences=inferences),
                'roc_auc': roc_auc(ground_truth=ground_truth,
                                   inferences=inferences,
-                                  experiment_dir=experiment_dir)
+                                  experiment_dir=experiment_dir),
+               'pr_auc': pr_auc(ground_truth=ground_truth,
+                                inferences=inferences,
+                                experiment_dir=experiment_dir)
               }
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
