@@ -2,3 +2,4 @@ Implement early stop
 Plot training and valid loss
 Plot learning rate per epoch
 Change Grad-CAM visualization: gc + original image
+Save config in experiment dir

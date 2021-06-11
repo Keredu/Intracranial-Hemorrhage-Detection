@@ -71,7 +71,7 @@ def train(conf):
         epoch_bar.set_postfix(vloss=epoch_loss, vacc=epoch_acc.item())
         scheduler.step()
 
-    #print('Best valid Acc: {:4f}'.format(best_acc))
+    print('Best valid Acc: {:4f}'.format(best_acc))
 
     # load best model weights
     #model.load_state_dict(best_weights)

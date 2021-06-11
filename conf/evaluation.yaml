@@ -1,7 +1,7 @@
 # Experiment config
 task: evaluation
 experiments_dir: ./experiments
-experiment_code: 001A
+experiment_code: reunion
 num_epochs: 12
 
 # Get dataset and dataloaders
