@@ -62,6 +62,7 @@ def get_config(yaml_path):
     conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
 
     # Get datasets
+    if task
     dataset_name = conf['data']['name']
     print(f'Dataset: {dataset_name}')
     conf['train_dataset'], conf['valid_dataset'] = get_datasets(conf)
@@ -81,7 +82,7 @@ def get_config(yaml_path):
     conf['model'] = initialize_model(conf)
 
     # Only in traning task
-    if conf['task'] == 'training':
+    if task == 'training':
         # Get optimizer
         optimizer_name = conf['optimizer']['name']
         print(f'Optimizer: {optimizer_name}')
@@ -98,7 +99,7 @@ def get_config(yaml_path):
         conf['scheduler'] = get_scheduler(conf)
 
     # Only in evaluation task
-    elif conf['task'] == 'evaluation':
+    elif task == 'evaluation':
         path = os.path.join(conf['experiment_dir'], 'best_weights.pt')
         if os.path.exists(path):
             print(f'Loading weights from {path}')
