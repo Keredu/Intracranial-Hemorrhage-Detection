@@ -37,6 +37,27 @@ class IHDataset(Dataset):
         return sample, target
 
 
+class IHTestDataset(Dataset):
+    """Intracranial Hemorrhage dataset."""
+    def __init__(self, root_dir, stage='', transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.data_dir = root_dir if root_dir[-1] == '/' else root_dir + '/'
+        import glob
+        self.data = glob.glob(self.data_dir + '*')
+        self.idx_to_img_path = dict(enumerate(self.data))
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        img_path = self.idx_to_img_path[idx]
+        sample = Image.open(img_path)
+        if self.transform:
+            sample = self.transform(sample)
+        return sample, img_path
+
+
 def get_datasets(conf):
     dataset = conf['data']['name']
     root_dir = conf['data']['path']
@@ -49,6 +70,9 @@ def get_datasets(conf):
         valid_dataset = IHDataset(root_dir=root_dir,
                                   stage='valid',
                                   transform=valid_transform)
+    elif dataset == 'IHTestDataset':
+        return IHTestDataset(root_dir=root_dir,
+                             transform=valid_transform)
     else:
         print('Dataset {dataset} not supported.')
         exit()
@@ -75,6 +99,7 @@ def get_dataloaders(conf):
 
 
 if __name__ == '__main__':
+    '''
     print(os.listdir('./data/windowed'))
     ds = IHDataset(root_dir='./data/windowed/', stage='valid')
     sample, target = ds[2]
@@ -83,3 +108,10 @@ if __name__ == '__main__':
     im.save('example.jpg')
     print(target)
     print(len(ds))
+    '''
+    ds = IHTestDataset(root_dir='../patients_windowed/001_1/')
+    sample, img_path = ds[0]
+    print('Img path:', img_path)
+    arr = sample
+    im = Image.fromarray(np.uint8(arr))
+    im.save('example.jpg')

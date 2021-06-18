@@ -1,0 +1,18 @@
+# Experiment config
+task: testing
+experiment_code: reunion
+results_dir: ../testing_results/EV0053/
+weights_path: ./best_weights.pt
+# Get dataset and dataloaders
+data:
+  name: IHTestDataset
+  path: ../patients_windowed/EV0053/
+  classes: [noIH, IH]
+  num_workers: 4
+
+# Initialize model
+model:
+  name: resnet34
+  feature_extract: False #False, finetune the whole model. True, only update new layer params
+  use_pretrained: False
+  print_model: False

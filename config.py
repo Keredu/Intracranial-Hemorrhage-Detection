@@ -41,6 +41,34 @@ def get_experiment_dir(conf):
             exit()
     return experiment_dir
 
+def get_test_config(conf):
+
+    # Check if results dir exists and create it
+    results_dir = conf['results_dir']
+    if os.path.exists(results_dir): rmtree(results_dir)
+    os.makedirs(results_dir)
+
+    # Get transforms
+    conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
+
+    # Get datasets
+    dataset_name = conf['data']['name']
+    print(f'Dataset: {dataset_name}')
+    conf['test_dataset'] = get_datasets(conf)
+
+    # Check if GPU is available
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    conf['device'] = device
+    print(f'Device: {device}')
+
+    # Initialize model
+    model_name = conf['model']['name']
+    print(f'Model: {model_name}')
+    conf['model'] = initialize_model(conf)
+
+    return conf
+
+
 def get_config(yaml_path):
     # Load YAML conf
     conf = yaml.safe_load(open(yaml_path, 'r'))
@@ -49,6 +77,10 @@ def get_config(yaml_path):
     task = conf['task']
     if task in ['training', 'evaluation']:
         print(f'Task: {task}')
+
+    elif task == 'testing':
+        return get_test_config(conf)
+
     else:
         print(f'Task {task} not supported.')
         exit()
@@ -62,7 +94,6 @@ def get_config(yaml_path):
     conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
 
     # Get datasets
-    if task
     dataset_name = conf['data']['name']
     print(f'Dataset: {dataset_name}')
     conf['train_dataset'], conf['valid_dataset'] = get_datasets(conf)
