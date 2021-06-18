@@ -2,6 +2,8 @@
 task: evaluation
 experiments_dir: ./experiments
 experiment_code: reunion
+metrics: True
+grad_cam: True
 
 # Get dataset and dataloaders
 data:
