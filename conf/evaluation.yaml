@@ -1,7 +1,7 @@
 # Experiment config
 task: evaluation
 experiments_dir: ./experiments
-experiment_code: reunion
+experiment_code: R50_002
 metrics: True
 grad_cam: True
 
@@ -11,11 +11,11 @@ data:
   path: ../data/windowed/
   classes: [noIH, IH]
   num_workers: 4
-  batch_size: 32
+  batch_size: 8
 
 # Initialize model
 model:
-  name: resnet34
+  name: resnet50
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: True
   print_model: False

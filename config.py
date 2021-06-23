@@ -13,16 +13,30 @@ from scheduler import get_scheduler
 
 
 def get_transforms(conf):
-    train_transform = transforms.Compose([transforms.Resize((224,224)),
-                                   transforms.RandomVerticalFlip(p=0.5),
-                                   transforms.RandomHorizontalFlip(p=0.5),
-                                   transforms.ToTensor(),
-                                   transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                                   ])
-    valid_transform = transforms.Compose([transforms.Resize((224,224)),
-                                   transforms.ToTensor(),
-                                   transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                                   ])
+    model_name = conf['model']['name']
+    if 'efficientdet' in model_name:
+        train_transform = transforms.Compose([transforms.Resize((512,512)),
+                                    transforms.RandomVerticalFlip(p=0.5),
+                                    transforms.RandomHorizontalFlip(p=0.5),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
+        valid_transform = transforms.Compose([transforms.Resize((512,512)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
+    elif 'resnet' in model_name:
+        train_transform = transforms.Compose([transforms.Resize((224,224)),
+                                    transforms.RandomVerticalFlip(p=0.5),
+                                    transforms.RandomHorizontalFlip(p=0.5),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
+        valid_transform = transforms.Compose([transforms.Resize((224,224)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
+
     return train_transform, valid_transform
 
 
