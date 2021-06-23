@@ -176,7 +176,7 @@ def save_sensitivity(filename, maps):
     cv2.imwrite(filename, maps)
 
 
-def gc_test(model, dataset, experiment_dir, classes, device):
+def gc_test_old(model, dataset, experiment_dir, classes, device):
     """
     Visualize model responses given multiple images
     """
@@ -225,3 +225,47 @@ def gc_test(model, dataset, experiment_dir, classes, device):
                     gcam=regions[j, 0],
                     raw_image=raw_images[j],
                 )
+
+
+def gc_test(model, dataset, experiment_dir, classes, device):
+    """
+    Visualize model responses given multiple images
+    """
+    target_layer = 'layer4'
+    topk = 1
+    output_dir = experiment_dir
+    from shutil import rmtree
+    if os.path.exists(output_dir): rmtree(output_dir)
+    os.makedirs(output_dir)
+    model.to(device)
+    model.eval()
+
+    for idx in range(len(dataset)):
+        image, image_path = dataset[idx]
+        image_name = os.path.split(image_path)[1]
+        images = torch.unsqueeze(image, 0)
+        images, raw_images = load_images(images)
+        images = images.to(device)
+
+        logits = model(images)
+        probs = F.softmax(logits, dim=1)
+
+        # =====================================================================
+        #print("Grad-CAM/Guided Backpropagation/Guided Grad-CAM:")
+
+        gcam = GradCAM(model=model)
+        _ = gcam.forward(images)
+
+        # Grad-CAM
+        gcam.backward(ids=torch.Tensor([[1]]).long().to(device)) # IH class
+        regions = gcam.generate(target_layer=target_layer)
+
+        # Grad-CAM
+        image_name, ext = image_name.split('.')
+        result_name = f'{image_name}-{probs[0,1]:.4f}.{ext}'
+        result_path = osp.join(output_dir, result_name)
+        save_gradcam(
+            filename=result_path,
+            gcam=regions[0, 0],
+            raw_image=raw_images[0],
+        )
