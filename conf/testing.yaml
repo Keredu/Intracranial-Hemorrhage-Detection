@@ -1,12 +1,12 @@
 # Experiment config
 task: testing
 experiment_code: reunion
-results_dir: ../testing_results/EV0053/
+results_dir: ../testing_results/EV001/
 weights_path: ./best_weights.pt
 # Get dataset and dataloaders
 data:
   name: IHTestDataset
-  path: ../patients_windowed/EV0053/
+  path: ../patients_windowed/EV001/
   classes: [noIH, IH]
   num_workers: 4
 
