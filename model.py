@@ -50,21 +50,30 @@ class EfficientClassification(nn.Module):
         self.effdet.class_net = nn.Identity()
 
         # In features from FPN
-        fc_in_features = sum(64 * i*i for i in [64,32,16,8,4])
-        self.fc_mid = nn.Linear(fc_in_features, 32)
-        self.fc_out = nn.Linear(32, num_classes)
+        fc_in_features = [64 * i*i for i in [64,32,16,8,4]]
+        mid = 64
+        self.fc0 = nn.Linear(fc_in_features[0], mid)
+        self.fc1 = nn.Linear(fc_in_features[1], mid)
+        self.fc2 = nn.Linear(fc_in_features[2], mid)
+        self.fc3 = nn.Linear(fc_in_features[3], mid)
+        self.fc4 = nn.Linear(fc_in_features[4], mid)
+        self.fc_out = nn.Linear(5 * mid, num_classes)
 
     def forward(self, x):
         fpn_out, _ = self.effdet(x)
         fpn_out = list(map(lambda t: torch.flatten(t, start_dim=1), fpn_out))
-
-        fpn_out = torch.cat(fpn_out, dim=1)
-        out = self.fc_out(self.fc_mid(fpn_out))
+        out0 = self.fc0(fpn_out[0])
+        out1 = self.fc1(fpn_out[1])
+        out2 = self.fc2(fpn_out[2])
+        out3 = self.fc3(fpn_out[3])
+        out4 = self.fc4(fpn_out[4])
+        fc_outs = torch.cat([out0,out1,out2,out3,out4], dim=1)
+        out = self.fc_out(fc_outs)
         return out
 
 if __name__ == '__main__':
 
-    x = torch.randn(20, 3, 512, 512)
+    x = torch.randn(1, 3, 512, 512)
     model = EfficientClassification(num_classes=2)
     fpn_out = model(x)
     print('FIN')
