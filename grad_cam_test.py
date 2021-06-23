@@ -249,6 +249,7 @@ def gc_test(model, dataset, experiment_dir, classes, device):
 
         logits = model(images)
         probs = F.softmax(logits, dim=1)
+        IH = classes[probs.argmax().item()]
 
         # =====================================================================
         #print("Grad-CAM/Guided Backpropagation/Guided Grad-CAM:")
@@ -262,7 +263,7 @@ def gc_test(model, dataset, experiment_dir, classes, device):
 
         # Grad-CAM
         image_name, ext = image_name.split('.')
-        result_name = f'{image_name}-{probs[0,1]:.4f}.{ext}'
+        result_name = f'{image_name}-ProbIH:{probs[0,1]:.4f}-{IH}.{ext}'
         result_path = osp.join(output_dir, result_name)
         save_gradcam(
             filename=result_path,
