@@ -18,7 +18,7 @@ class IHDataset(Dataset):
             lines = [line.strip().split(',') for line in csv.readlines()]
             header, lines = lines[0], lines[1:]
             self.annots = {k:[] for k in header}
-            for line in lines:
+            for line in lines[:10000:2]:
                 for k,v in zip(header,line):
                     self.annots[k].append(v)
 

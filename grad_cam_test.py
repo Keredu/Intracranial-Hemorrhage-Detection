@@ -227,13 +227,13 @@ def gc_test_old(model, dataset, experiment_dir, classes, device):
                 )
 
 
-def gc_test(model, dataset, experiment_dir, classes, device):
+def gc_test(model, dataset, results_dir, classes, device):
     """
     Visualize model responses given multiple images
     """
     target_layer = 'layer4'
     topk = 1
-    output_dir = experiment_dir
+    output_dir = results_dir
     from shutil import rmtree
     if os.path.exists(output_dir): rmtree(output_dir)
     os.makedirs(output_dir)

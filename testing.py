@@ -19,7 +19,7 @@ def test(conf):
 
     gc_test(model=model,
        dataset=dataset,
-       experiment_dir=results_dir,
+       results_dir=results_dir,
        classes=classes,
        device=device)
 

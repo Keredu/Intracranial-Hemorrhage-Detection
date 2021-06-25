@@ -18,49 +18,47 @@ def evaluate(conf):
     model = model.to(device)
     model.eval()
 
-    metrics = conf['metrics']
-    grad_cam = conf['grad_cam']
-    if metrics:
-        ground_truth = None
-        inferences = None
+    #grad_cam = conf['grad_cam']
+    ground_truth = None
+    inferences = None
 
-        batch_bar = tqdm(dataloader, desc='Batch', unit='batches', leave=False)
-        for inputs, labels in batch_bar:
-            inputs = inputs.to(device)
-            with torch.set_grad_enabled(False):
-                outputs = model(inputs)
+    batch_bar = tqdm(dataloader, desc='Batch', unit='batches', leave=False)
+    for inputs, labels in batch_bar:
+        inputs = inputs.to(device)
+        with torch.set_grad_enabled(False):
+            outputs = model(inputs)
 
-            probs = F.softmax(outputs, dim=1)[:, 1]
-            probs = probs.cpu()
-            if ground_truth is None and inferences is None:
-                ground_truth = labels
-                inferences = probs
-            else:
-                ground_truth = torch.cat((ground_truth, labels))
-                inferences = torch.cat((inferences, probs))
+        probs = F.softmax(outputs, dim=1)[:, 1]
+        probs = probs.cpu()
+        if ground_truth is None and inferences is None:
+            ground_truth = labels
+            inferences = probs
+        else:
+            ground_truth = torch.cat((ground_truth, labels))
+            inferences = torch.cat((inferences, probs))
 
         # Calculate save metrics
 
-        metrics = {'accuracy': accuracy(ground_truth=ground_truth,
-                                        inferences=inferences),
-                   'roc_auc': roc_auc(ground_truth=ground_truth,
-                                      inferences=inferences,
-                                      experiment_dir=experiment_dir),
-                   'pr_auc': pr_auc(ground_truth=ground_truth,
+    metrics = {'accuracy': accuracy(ground_truth=ground_truth,
+                                    inferences=inferences),
+                'roc_auc': roc_auc(ground_truth=ground_truth,
                                     inferences=inferences,
-                                    experiment_dir=experiment_dir)
-                  }
+                                    experiment_dir=experiment_dir),
+                'pr_auc': pr_auc(ground_truth=ground_truth,
+                                inferences=inferences,
+                                experiment_dir=experiment_dir)
+                }
 
-        with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
-            yaml.dump(metrics, fp)
-
+    with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
+        yaml.dump(metrics, fp)
+    '''
     if grad_cam:
         gc(model=model,
            dataloader=dataloader,
            experiment_dir=experiment_dir,
            classes=classes,
            device=device)
-
+    '''
 
 if __name__ == '__main__':
     from config import get_config
