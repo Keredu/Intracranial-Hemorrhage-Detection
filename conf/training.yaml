@@ -2,14 +2,14 @@
 task: training
 experiments_dir: ./experiments
 experiment_code: EFFDET_001
-num_epochs: 10
+num_epochs: 3
 
 # Get dataset and dataloaders
 data:
   name: IHDataset
   path: ../data/windowed/
   classes: [noIH, IH]
-  num_workers: 4
+  num_workers: 8
   batch_size: 4
 
 # Initialize model
@@ -22,7 +22,7 @@ model:
 # Get optimizer
 optimizer:
   name: SGD
-  lr: 0.02
+  lr: 0.0002
   momentum: 0.9
   weight_decay: 0.001
   print_params: False
