@@ -1,10 +1,11 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import (roc_curve,
-                             precision_recall_curve as pr_curve,
-                             auc,
-                             accuracy_score)
+from sklearn.metrics import (precision_recall_curve as pr_curve,
+                             confusion_matrix,
+                             accuracy_score,
+                             roc_curve,
+                             auc)
 
 def roc_auc(ground_truth, inferences, experiment_dir):
     fpr, tpr, threshold = roc_curve(ground_truth, inferences)
@@ -20,6 +21,7 @@ def roc_auc(ground_truth, inferences, experiment_dir):
     plt.savefig(os.path.join(experiment_dir, 'roc_auc.png'))
     plt.clf()
     return roc_auc
+
 
 def pr_auc(ground_truth, inferences, experiment_dir):
     precision, recall, threshold = pr_curve(ground_truth, inferences)
@@ -37,5 +39,14 @@ def pr_auc(ground_truth, inferences, experiment_dir):
     return pr_auc
 
 
-def accuracy(ground_truth, inferences, threshold=0.5):
+def calc_accuracy(ground_truth, inferences, threshold=0.5):
     return accuracy_score(ground_truth, inferences > threshold).item()
+
+
+def calc_conf_mat(ground_truth, inferences, normalize=None, threshold=0.5):
+
+    conf_mat = confusion_matrix(y_true=ground_truth,
+                                y_pred=inferences > threshold,
+                                normalize=normalize)
+    tn, fp, fn, tp = list(map(lambda x: x.item(), conf_mat.ravel()))
+    return {'tn': tn, 'fp': fp, 'fn': fn, 'tp': tp}

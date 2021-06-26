@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import torch
 from torch.nn import functional as F
-from metrics import accuracy, roc_auc, pr_auc
+from metrics import calc_accuracy, roc_auc, pr_auc, calc_conf_mat
 import os
 import yaml
 from grad_cam import gc
@@ -39,14 +39,19 @@ def evaluate(conf):
 
         # Calculate save metrics
 
-    metrics = {'accuracy': accuracy(ground_truth=ground_truth,
-                                    inferences=inferences),
-                'roc_auc': roc_auc(ground_truth=ground_truth,
-                                    inferences=inferences,
-                                    experiment_dir=experiment_dir),
-                'pr_auc': pr_auc(ground_truth=ground_truth,
+    metrics = {'confusion_matrix': calc_conf_mat(ground_truth=ground_truth,
+                                                 inferences=inferences,
+                                                 normalize='pred',
+                                                 threshold=0.5),
+               'accuracy': calc_accuracy(ground_truth=ground_truth,
+                                         inferences=inferences,
+                                         threshold=0.5),
+               'roc_auc': roc_auc(ground_truth=ground_truth,
+                                  inferences=inferences,
+                                  experiment_dir=experiment_dir),
+               'pr_auc': pr_auc(ground_truth=ground_truth,
                                 inferences=inferences,
-                                experiment_dir=experiment_dir)
+                                experiment_dir=experiment_dir),
                 }
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:

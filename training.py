@@ -122,11 +122,6 @@ def train(conf):
 
     print('Best valid Acc: {:4f}'.format(best_acc))
 
-    # load best model weights
-    #model.load_state_dict(best_weights)
-#
-    #return model, valid_acc_history
-
 if __name__ == '__main__':
     from config import get_config
     # Get config from conf.yaml
