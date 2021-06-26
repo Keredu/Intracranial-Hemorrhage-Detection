@@ -117,7 +117,7 @@ def train(conf):
                 torch.save(best_weights, weights_path)
 
         epoch_bar.set_postfix(tloss=train_loss,tacc=train_acc,
-                              vloss=valid_loss, vacc=train_acc)
+                              vloss=valid_loss, vacc=valid_acc)
         scheduler.step()
 
     print('Best valid Acc: {:4f}'.format(best_acc))
