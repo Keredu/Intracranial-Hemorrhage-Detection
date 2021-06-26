@@ -103,7 +103,7 @@ def train(conf):
                 train_accs.append(train_acc)
             else:
                 valid_loss = epoch_loss
-                valid_acc = epoch_acc
+                valid_acc = epoch_acc.item()
                 valid_losses.append(valid_loss)
                 valid_accs.append(valid_acc)
                 save_losses_graph(train_losses, valid_losses, experiment_dir)
