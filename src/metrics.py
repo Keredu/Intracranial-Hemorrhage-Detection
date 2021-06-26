@@ -3,7 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import (precision_recall_curve as pr_curve,
                              confusion_matrix,
+                             precision_score,
                              accuracy_score,
+                             recall_score,
                              roc_curve,
                              auc)
 
@@ -39,14 +41,14 @@ def pr_auc(ground_truth, inferences, experiment_dir):
     return pr_auc
 
 
-def calc_accuracy(ground_truth, inferences, threshold=0.5):
-    return accuracy_score(ground_truth, inferences > threshold).item()
-
-
-def calc_conf_mat(ground_truth, inferences, normalize=None, threshold=0.5):
-
+def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
+    y_pred = inferences > threshold
+    precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
+    recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
+    accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred)
     conf_mat = confusion_matrix(y_true=ground_truth,
-                                y_pred=inferences > threshold,
+                                y_pred=y_pred,
                                 normalize=normalize)
     tn, fp, fn, tp = list(map(lambda x: x.item(), conf_mat.ravel()))
-    return {'tn': tn, 'fp': fp, 'fn': fn, 'tp': tp}
+    return {'threshold': threshold, 'tn': tn, 'fp': fp, 'fn': fn, 'tp': tp,
+            'precision': precision, 'recall': recall, 'accuracy': accuracy}

@@ -1,7 +1,7 @@
 from src import get_config, train, evaluate, test
 
 # Get config from conf.yaml
-conf = get_config('./conf/testing.yaml')
+conf = get_config('./conf/evaluation.yaml')
 
 task = conf['task']
 if task == 'training':

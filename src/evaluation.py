@@ -3,7 +3,7 @@ sys.path.append('.')
 from tqdm import tqdm
 import torch
 from torch.nn import functional as F
-from .metrics import calc_accuracy, roc_auc, pr_auc, calc_conf_mat
+from .metrics import roc_auc, pr_auc, calc_metrics
 import os
 import yaml
 from .grad_cam import gc
@@ -41,13 +41,18 @@ def evaluate(conf):
 
         # Calculate save metrics
 
-    metrics = {'confusion_matrix': calc_conf_mat(ground_truth=ground_truth,
-                                                 inferences=inferences,
-                                                 normalize='pred',
-                                                 threshold=0.5),
-               'accuracy': calc_accuracy(ground_truth=ground_truth,
-                                         inferences=inferences,
-                                         threshold=0.5),
+    metrics = {'metrics0.5': calc_metrics(ground_truth=ground_truth,
+                                          inferences=inferences,
+                                          normalize='pred',
+                                          threshold=0.5),
+               'metrics0.7': calc_metrics(ground_truth=ground_truth,
+                                          inferences=inferences,
+                                          normalize='pred',
+                                          threshold=0.7),
+               'metrics0.9': calc_metrics(ground_truth=ground_truth,
+                                          inferences=inferences,
+                                          normalize='pred',
+                                          threshold=0.9),
                'roc_auc': roc_auc(ground_truth=ground_truth,
                                   inferences=inferences,
                                   experiment_dir=experiment_dir),
