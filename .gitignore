@@ -2,7 +2,7 @@ data/
 *.pt
 weights/
 __pycache__/
-experiments/*
+experiments/
 .ipynb_checkpoints/
 
 
