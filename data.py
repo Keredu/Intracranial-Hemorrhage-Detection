@@ -13,12 +13,13 @@ class IHDataset(Dataset):
         self.stage = stage
         self.transform = transform
         self.data_dir = os.path.join(self.root_dir, self.stage)
-
+        #x = 180000 if stage == 'valid' or stage == 'test' else 180000
+        #y = 30 if stage == 'valid' or stage == 'test' else 2
         with open(os.path.join(root_dir, f'annots/{stage}.csv'), 'r') as csv:
             lines = [line.strip().split(',') for line in csv.readlines()]
             header, lines = lines[0], lines[1:]
             self.annots = {k:[] for k in header}
-            for line in lines[:10000:2]:
+            for line in lines:#[:x:y]:
                 for k,v in zip(header,line):
                     self.annots[k].append(v)
 
