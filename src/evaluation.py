@@ -1,10 +1,12 @@
+import sys
+sys.path.append('.')
 from tqdm import tqdm
 import torch
 from torch.nn import functional as F
-from metrics import calc_accuracy, roc_auc, pr_auc, calc_conf_mat
+from .metrics import calc_accuracy, roc_auc, pr_auc, calc_conf_mat
 import os
 import yaml
-from grad_cam import gc
+from .grad_cam import gc
 
 
 def evaluate(conf):

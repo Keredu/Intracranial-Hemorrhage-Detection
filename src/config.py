@@ -1,3 +1,5 @@
+import sys
+sys.path.append('.')
 import yaml
 import os
 from shutil import rmtree
@@ -5,12 +7,13 @@ from shutil import rmtree
 import torch
 import torchvision.transforms as transforms
 
-from data import get_datasets, get_dataloaders
-from model import initialize_model
-from optimizer import get_optimizer
-from criterion import get_criterion
-from scheduler import get_scheduler
+from src.data import get_datasets, get_dataloaders
+from src.model import initialize_model
+from src.optimizer import get_optimizer
+from src.criterion import get_criterion
+from src.scheduler import get_scheduler
 import yaml
+
 
 
 def get_transforms(conf):

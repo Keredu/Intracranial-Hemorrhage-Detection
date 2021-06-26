@@ -2,7 +2,7 @@
 task: testing
 experiment_code: reunion
 results_dir: ../testing_results/001_1/
-weights_path: ./best_weights.pt
+weights_path: ../best_weights.pt
 # Get dataset and dataloaders
 data:
   name: IHTestDataset

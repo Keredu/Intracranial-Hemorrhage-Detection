@@ -1,8 +1,10 @@
+import sys
+sys.path.append('.')
 import torch
 from torch.nn import functional as F
 import os
 import yaml
-from grad_cam_test import gc_test
+from src.grad_cam_test import gc_test
 
 
 def test(conf):
