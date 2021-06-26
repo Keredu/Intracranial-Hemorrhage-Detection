@@ -1,7 +1,7 @@
 # Experiment config
 task: training
 experiments_dir: ./experiments
-experiment_code: EFFDET_001
+experiment_code: EFFDET_002
 num_epochs: 3
 
 # Get dataset and dataloaders

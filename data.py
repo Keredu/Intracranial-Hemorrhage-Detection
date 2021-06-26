@@ -63,6 +63,7 @@ def get_datasets(conf):
     root_dir = conf['data']['path']
     train_transform = conf['train_transform']
     valid_transform = conf['valid_transform']
+    test_transform = conf['test_transform']
     if dataset == 'IHDataset':
         train_dataset = IHDataset(root_dir=root_dir,
                                   stage='train',
@@ -70,18 +71,22 @@ def get_datasets(conf):
         valid_dataset = IHDataset(root_dir=root_dir,
                                   stage='valid',
                                   transform=valid_transform)
+        test_dataset = IHDataset(root_dir=root_dir,
+                                  stage='test',
+                                  transform=test_transform)
     elif dataset == 'IHTestDataset':
         return IHTestDataset(root_dir=root_dir,
                              transform=valid_transform)
     else:
         print('Dataset {dataset} not supported.')
         exit()
-    return train_dataset, valid_dataset
+    return train_dataset, valid_dataset, test_dataset
 
 
 def get_dataloaders(conf):
     train_dataset = conf['train_dataset']
     valid_dataset = conf['valid_dataset']
+    test_dataset = conf['test_dataset']
     batch_size = conf['data']['batch_size']
     num_workers = conf['data']['num_workers']
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
@@ -92,10 +97,15 @@ def get_dataloaders(conf):
     valid_loader = torch.utils.data.DataLoader(dataset=valid_dataset,
                                                batch_size= batch_size,
                                                num_workers=num_workers,
-                                               #shuffle=False,
-                                               shuffle=True,
+                                               shuffle=False,
                                                pin_memory=True)
-    return train_loader, valid_loader
+    test_loader = torch.utils.data.DataLoader(dataset=valid_dataset,
+                                              batch_size= batch_size,
+                                              num_workers=num_workers,
+                                              shuffle=False,
+                                              pin_memory=True)
+
+    return train_loader, valid_loader, test_loader
 
 
 if __name__ == '__main__':

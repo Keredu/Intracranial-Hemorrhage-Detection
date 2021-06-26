@@ -10,6 +10,7 @@ from model import initialize_model
 from optimizer import get_optimizer
 from criterion import get_criterion
 from scheduler import get_scheduler
+import yaml
 
 
 def get_transforms(conf):
@@ -25,6 +26,11 @@ def get_transforms(conf):
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                     ])
+        test_transform = transforms.Compose([transforms.Resize((512,512)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
+
     elif 'resnet' in model_name:
         train_transform = transforms.Compose([transforms.Resize((224,224)),
                                     transforms.RandomVerticalFlip(p=0.5),
@@ -36,8 +42,12 @@ def get_transforms(conf):
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                     ])
+        test_transform = transforms.Compose([transforms.Resize((224,224)),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                    ])
 
-    return train_transform, valid_transform
+    return train_transform, valid_transform, test_transform
 
 
 def get_experiment_dir(conf):
@@ -50,6 +60,9 @@ def get_experiment_dir(conf):
     if conf['task'] == 'training':
         if not os.path.exists(experiment_dir):
             os.makedirs(experiment_dir)
+            save_conf = os.path.join(experiment_dir, conf['task'] + '.yaml')
+            with open(save_conf, 'w') as fp:
+                yaml.dump(conf, fp)
         else:
             print(f'Experiment dir {experiment_dir} exists.')
             exit()
@@ -105,16 +118,27 @@ def get_config(yaml_path):
     print(f'Experiment directory: {experiment_dir}')
 
     # Get transforms
-    conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
+    transforms = get_transforms(conf)
+    conf['train_transform'] = transforms[0]
+    conf['valid_transform'] = transforms[1]
+    conf['test_transform'] = transforms[2]
 
     # Get datasets
     dataset_name = conf['data']['name']
     print(f'Dataset: {dataset_name}')
-    conf['train_dataset'], conf['valid_dataset'] = get_datasets(conf)
+    datasets = get_datasets(conf)
+    conf['train_dataset'] = datasets[0]
+    conf['valid_dataset'] = datasets[1]
+    conf['test_dataset'] = datasets[2]
 
     # Get dataloaders
-    train_dataloader, valid_dataloader = get_dataloaders(conf)
-    conf['dataloaders'] = {'train':train_dataloader, 'valid':valid_dataloader}
+    dataloaders = get_dataloaders(conf)
+    train_dataloader = dataloaders[0]
+    valid_dataloader = dataloaders[1]
+    test_dataloader = dataloaders[2]
+    conf['dataloaders'] = {'train':train_dataloader,
+                           'valid':valid_dataloader,
+                           'test': test_dataloader}
 
     # Check if GPU is available
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

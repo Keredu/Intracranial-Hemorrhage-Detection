@@ -9,7 +9,7 @@ from grad_cam import gc
 
 def evaluate(conf):
     device = conf['device']
-    dataloader = conf['dataloaders']['valid']
+    dataloader = conf['dataloaders']['test']
     experiment_dir = conf['experiment_dir']
     classes = conf['data']['classes']
 
