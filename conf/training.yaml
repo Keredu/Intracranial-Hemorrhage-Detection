@@ -1,8 +1,8 @@
 # Experiment config
 task: training
 experiments_dir: ./experiments
-experiment_code: EFFDET_002
-num_epochs: 3
+experiment_code: R50_00xxx
+num_epochs: 10
 
 # Get dataset and dataloaders
 data:
@@ -10,11 +10,11 @@ data:
   path: ../data/windowed/
   classes: [noIH, IH]
   num_workers: 8
-  batch_size: 4
+  batch_size: 32
 
 # Initialize model
 model:
-  name: efficientdet_d0
+  name: resnet50
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: True
   print_model: False
@@ -22,7 +22,7 @@ model:
 # Get optimizer
 optimizer:
   name: SGD
-  lr: 0.0001
+  lr: 0.01
   momentum: 0.9
   weight_decay: 0.001
   print_params: False
@@ -34,5 +34,5 @@ criterion:
 # Get scheduler
 scheduler:
   name: StepLR
-  step_size: 1
-  gamma: 0.5
+  step_size: 2
+  gamma: 0.6

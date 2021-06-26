@@ -76,12 +76,15 @@ def get_test_config(conf):
     os.makedirs(results_dir)
 
     # Get transforms
-    conf['train_transform'], conf['valid_transform'] = get_transforms(conf)
+    transforms = get_transforms(conf)
+    conf['train_transform'] = transforms[0]
+    conf['valid_transform'] = transforms[1]
+    conf['test_transform'] = transforms[2]
 
     # Get datasets
     dataset_name = conf['data']['name']
     print(f'Dataset: {dataset_name}')
-    conf['test_dataset'] = get_datasets(conf)
+    _, _, conf['test_dataset'] = get_datasets(conf)
 
     # Check if GPU is available
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
