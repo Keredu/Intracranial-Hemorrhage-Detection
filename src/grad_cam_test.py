@@ -20,7 +20,7 @@ class _BaseWrapper(object):
     def forward(self, image):
         self.image_shape = image.shape[2:]
         self.logits = self.model(image)
-        self.probs = F.softmax(self.logits, dim=1)
+        self.probs = F.log_softmax(self.logits, dim=1)#softmax(self.logits, dim=1)
         return self.probs.sort(dim=1, descending=True)  # ordered results
 
     def backward(self, ids):
