@@ -61,7 +61,7 @@ def gc(model, dataset, results_dir, classes, device):
         target_category = 1
 
         # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
-        grayscale_cam = cam(input_tensor=input_tensor, target_category=target_category,aug_smooth=True,eigen_smooth=True)
+        grayscale_cam = cam(input_tensor=input_tensor, target_category=target_category, aug_smooth=True,eigen_smooth=True)
 
         # In this example grayscale_cam has only one image in the batch:
         grayscale_cam = grayscale_cam[0, :]

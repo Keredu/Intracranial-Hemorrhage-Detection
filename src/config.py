@@ -136,6 +136,7 @@ def get_config(yaml_path):
     conf['train_dataset'] = datasets[0]
     conf['valid_dataset'] = datasets[1]
     conf['test_dataset'] = datasets[2]
+    conf['patients_dataset'] = datasets[3]
 
     # Get dataloaders
     dataloaders = get_dataloaders(conf)

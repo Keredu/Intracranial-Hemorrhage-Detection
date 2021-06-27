@@ -6,7 +6,7 @@ from torch.nn import functional as F
 from .metrics import roc_auc, pr_auc, calc_metrics
 import os
 import yaml
-from .grad_cam import gc
+import numpy as np
 
 
 def evaluate(conf):
@@ -14,17 +14,18 @@ def evaluate(conf):
     dataloader = conf['dataloaders']['test']
     experiment_dir = conf['experiment_dir']
     classes = conf['data']['classes']
+    batch_size = conf['data']['batch_size']
 
     model = conf['model']
     model.load_state_dict(conf['best_weights'])
     model = model.to(device)
     model.eval()
 
-    #grad_cam = conf['grad_cam']
+
     ground_truth = None
     inferences = None
 
-    batch_bar = tqdm(dataloader, desc='Batch', unit='batches', leave=False)
+    batch_bar = tqdm(dataloader, desc='Batch', unit='batches', leave=True)
     for inputs, labels in batch_bar:
         inputs = inputs.to(device)
         with torch.set_grad_enabled(False):
@@ -43,15 +44,15 @@ def evaluate(conf):
 
     metrics = {'metrics0.5': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
+                                          normalize='pred',
                                           threshold=0.5),
                'metrics0.7': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
+                                          normalize='pred',
                                           threshold=0.7),
                'metrics0.9': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
+                                          normalize='pred',
                                           threshold=0.9),
                'roc_auc': roc_auc(ground_truth=ground_truth,
                                   inferences=inferences,
@@ -61,18 +62,44 @@ def evaluate(conf):
                                 experiment_dir=experiment_dir),
                 }
 
+    patients_dataset = conf['patients_dataset']
+    test_patients = patients_dataset.test_patients
+    patients_bar = tqdm(test_patients.items(),
+                        desc='Patient', unit='patients', leave=True)
+
+    inferences = {1: [], 3: [], 5: []}
+    ground_truth = []
+    for patient, patient_data in patients_bar:
+        patient_IH = patient_data['IH'] # If the patient has IH or not
+        slices = patient_data['slices_IH'] + patient_data['slices_noIH']
+        slices_with_IH = 0
+        samples = []
+        for slice_id in slices:
+            sample, _ = patients_dataset.getSlice(slice_id)
+            samples.append(sample)
+
+        for i in range(0, len(samples), batch_size):
+            batch = torch.stack(samples[i:i+batch_size], dim=0)
+            batch = batch.to(device)
+            with torch.set_grad_enabled(False):
+                outputs = model(batch)
+            IH_probs = F.softmax(outputs, dim=1)[:, 1]
+            slices_with_IH += (IH_probs > 0.9).sum()
+        for num_IH_threshold in [1,3,5]:
+            net_IH_prediction = slices_with_IH >= num_IH_threshold
+            inferences[num_IH_threshold].append(net_IH_prediction)
+        ground_truth.append(patient_IH)
+
+    metrics['patients_metrics'] = []
+    ground_truth = np.array(ground_truth).astype(float)
+    for num_IH_threshold, pred in inferences.items():
+        pred = np.array(pred).astype(float)
+        patients_metrics = calc_metrics(ground_truth=ground_truth,
+                                        inferences=pred,
+                                        normalize='pred',
+                                        threshold=0.5)
+        patients_metrics['threshold'] = num_IH_threshold
+        metrics['patients_metrics'].append(patients_metrics)
+
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
         yaml.dump(metrics, fp)
-    '''
-    if grad_cam:
-        gc(model=model,
-           dataloader=dataloader,
-           experiment_dir=experiment_dir,
-           classes=classes,
-           device=device)
-    '''
-
-if __name__ == '__main__':
-    from config import get_config
-    conf = get_config('./conf/evaluation.yaml')
-    evaluate(conf)

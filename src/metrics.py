@@ -43,9 +43,9 @@ def pr_auc(ground_truth, inferences, experiment_dir):
 
 def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
     y_pred = inferences > threshold
-    precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
     accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred).item()
     recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
+    precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
 
     conf_mat = confusion_matrix(y_true=ground_truth,
                                 y_pred=y_pred,
