@@ -90,16 +90,25 @@ def evaluate(conf):
             inferences[num_IH_threshold].append(net_IH_prediction)
         ground_truth.append(patient_IH)
 
-    metrics['patients_metrics'] = []
     ground_truth = np.array(ground_truth).astype(float)
-    for num_IH_threshold, pred in inferences.items():
-        pred = np.array(pred).astype(float)
-        patients_metrics = calc_metrics(ground_truth=ground_truth,
-                                        inferences=pred,
-                                        normalize='pred',
-                                        threshold=0.5)
-        patients_metrics['threshold'] = num_IH_threshold
-        metrics['patients_metrics'].append(patients_metrics)
+    inferences1 = np.array(inferences[1]).astype(float)
+    inferences3 = np.array(inferences[3]).astype(float)
+    inferences5 = np.array(inferences[5]).astype(float)
+    metrics['patients_metrics (>= 1 IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferences1,
+                                                    normalize='pred',
+                                                    threshold=0.5)
+    metrics['patients_metrics (>= 3 IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferences3,
+                                                    normalize='pred',
+                                                    threshold=0.5)
+    metrics['patients_metrics (>= 5 IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferences5,
+                                                    normalize='pred',
+                                                    threshold=0.5)
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
         yaml.dump(metrics, fp)
