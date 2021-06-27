@@ -22,7 +22,7 @@ def roc_auc(ground_truth, inferences, experiment_dir):
     plt.xlabel('False Positive Rate')
     plt.savefig(os.path.join(experiment_dir, 'roc_auc.png'))
     plt.clf()
-    return roc_auc
+    return round(roc_auc, 3)
 
 
 def pr_auc(ground_truth, inferences, experiment_dir):
@@ -38,17 +38,19 @@ def pr_auc(ground_truth, inferences, experiment_dir):
     plt.xlabel('Recall')
     plt.savefig(os.path.join(experiment_dir, 'pr_auc.png'))
     plt.clf()
-    return pr_auc
+    return round(pr_auc, 3)
 
 
 def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
     y_pred = inferences > threshold
     precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
+    accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred).item()
     recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
-    accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred)
+
     conf_mat = confusion_matrix(y_true=ground_truth,
                                 y_pred=y_pred,
                                 normalize=normalize)
     tn, fp, fn, tp = list(map(lambda x: x.item(), conf_mat.ravel()))
-    return {'threshold': threshold, 'tn': tn, 'fp': fp, 'fn': fn, 'tp': tp,
-            'precision': precision, 'recall': recall, 'accuracy': accuracy}
+    metrics = {'threshold': threshold, 'tp': tp, 'fp': fp, 'tn': tn, 'fn': fn,
+               'precision': precision, 'recall': recall, 'accuracy': accuracy}
+    return {k: round(v, 3) for k,v in metrics.items()}

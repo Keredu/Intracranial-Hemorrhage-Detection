@@ -231,7 +231,7 @@ def gc_test(model, dataset, results_dir, classes, device):
     """
     Visualize model responses given multiple images
     """
-    target_layer = 'layer4'
+    target_layer = 'conv1'
     topk = 1
     output_dir = results_dir
     from shutil import rmtree

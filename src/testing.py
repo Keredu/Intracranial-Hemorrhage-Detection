@@ -4,7 +4,7 @@ import torch
 from torch.nn import functional as F
 import os
 import yaml
-from src.grad_cam_test import gc_test
+from src.new_grad_cam import gc
 
 
 def test(conf):
@@ -19,7 +19,7 @@ def test(conf):
     model = model.to(device)
     model.eval()
 
-    gc_test(model=model,
+    gc(model=model,
        dataset=dataset,
        results_dir=results_dir,
        classes=classes,

@@ -1,18 +1,18 @@
 # Experiment config
 task: testing
-experiment_code: reunion
-results_dir: ../testing_results/001_1/
-weights_path: ../best_weights.pt
+#experiment_code: EFFDET_002
+results_dir: ../testing_results/012_1/
+weights_path: ./experiments/EFFDET_002/best_weights.pt
 # Get dataset and dataloaders
 data:
   name: IHTestDataset
-  path: ../patients_windowed/001_1/
+  path: ../patients_windowed/012_1/
   classes: [noIH, IH]
   num_workers: 4
 
 # Initialize model
 model:
-  name: resnet34
+  name: efficientdet_d0
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: False
   print_model: False
