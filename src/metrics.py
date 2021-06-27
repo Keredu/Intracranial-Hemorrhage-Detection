@@ -44,13 +44,22 @@ def pr_auc(ground_truth, inferences, experiment_dir):
 def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
     y_pred = inferences > threshold
     accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred).item()
-    recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
-    precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
+    #recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
+    #precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
 
     conf_mat = confusion_matrix(y_true=ground_truth,
                                 y_pred=y_pred,
                                 normalize=normalize)
     tn, fp, fn, tp = list(map(lambda x: x.item(), conf_mat.ravel()))
-    metrics = {'threshold': threshold, 'tp': tp, 'fp': fp, 'tn': tn, 'fn': fn,
-               'precision': precision, 'recall': recall, 'accuracy': accuracy}
+
+    tpr = tp / (tp + fn)
+    tnr = tn / (tn + fp)
+    ppv = tp / (tp + fp)
+    npv = tn / (tn + fn)
+
+    metrics = {'threshold': threshold,
+               'TPR': tpr,
+               'TNR': tnr,
+               'PPV': ppv,
+               'NPV': npv}
     return {k: round(v, 3) for k,v in metrics.items()}

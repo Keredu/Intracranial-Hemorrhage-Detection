@@ -44,15 +44,15 @@ def evaluate(conf):
 
     metrics = {'metrics0.5': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='pred',
+                                          normalize='all',
                                           threshold=0.5),
                'metrics0.7': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='pred',
+                                          normalize='all',
                                           threshold=0.7),
                'metrics0.9': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='pred',
+                                          normalize='all',
                                           threshold=0.9),
                'roc_auc': roc_auc(ground_truth=ground_truth,
                                   inferences=inferences,
@@ -97,17 +97,17 @@ def evaluate(conf):
     metrics['patients_metrics (>= 1 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
                                                     inferences=inferences1,
-                                                    normalize='pred',
+                                                    normalize='all',
                                                     threshold=0.5)
     metrics['patients_metrics (>= 3 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
                                                     inferences=inferences3,
-                                                    normalize='pred',
+                                                    normalize='all',
                                                     threshold=0.5)
     metrics['patients_metrics (>= 5 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
                                                     inferences=inferences5,
-                                                    normalize='pred',
+                                                    normalize='all',
                                                     threshold=0.5)
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
