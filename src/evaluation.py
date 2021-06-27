@@ -44,15 +44,12 @@ def evaluate(conf):
 
     metrics = {'metrics0.5': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
                                           threshold=0.5),
                'metrics0.7': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
                                           threshold=0.7),
                'metrics0.9': calc_metrics(ground_truth=ground_truth,
                                           inferences=inferences,
-                                          normalize='all',
                                           threshold=0.9),
                'roc_auc': roc_auc(ground_truth=ground_truth,
                                   inferences=inferences,
@@ -67,7 +64,7 @@ def evaluate(conf):
     patients_bar = tqdm(test_patients.items(),
                         desc='Patient', unit='patients', leave=True)
 
-    inferences = {1: [], 3: [], 5: []}
+    inferences = {1: [], 2:[], 3: [], 4: [], 5: []}
     ground_truth = []
     for patient, patient_data in patients_bar:
         patient_IH = patient_data['IH'] # If the patient has IH or not
@@ -84,31 +81,39 @@ def evaluate(conf):
             with torch.set_grad_enabled(False):
                 outputs = model(batch)
             IH_probs = F.softmax(outputs, dim=1)[:, 1]
-            slices_with_IH += (IH_probs > 0.9).sum()
-        for num_IH_threshold in [1,3,5]:
+            slices_with_IH += (IH_probs > 0.8).sum()
+        for num_IH_threshold in [1,2,3,4,5]:
             net_IH_prediction = slices_with_IH >= num_IH_threshold
             inferences[num_IH_threshold].append(net_IH_prediction)
         ground_truth.append(patient_IH)
 
     ground_truth = np.array(ground_truth).astype(float)
     inferences1 = np.array(inferences[1]).astype(float)
+    inferences2 = np.array(inferences[2]).astype(float)
     inferences3 = np.array(inferences[3]).astype(float)
+    inferences4 = np.array(inferences[4]).astype(float)
     inferences5 = np.array(inferences[5]).astype(float)
     metrics['patients_metrics (>= 1 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
-                                                    inferences=inferences1,
-                                                    normalize='all',
-                                                    threshold=0.5)
+                                                    inferences=inferences1)
+    metrics['patients_metrics (>= 2 IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferences2)
     metrics['patients_metrics (>= 3 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
-                                                    inferences=inferences3,
-                                                    normalize='all',
-                                                    threshold=0.5)
+                                                    inferences=inferences3)
+    metrics['patients_metrics (>= 4 IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferences4)
     metrics['patients_metrics (>= 5 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
-                                                    inferences=inferences5,
-                                                    normalize='all',
-                                                    threshold=0.5)
+                                                    inferences=inferences5)
+
+    del metrics['patients_metrics (>= 1 IH slice)']['threshold']
+    del metrics['patients_metrics (>= 2 IH slice)']['threshold']
+    del metrics['patients_metrics (>= 3 IH slice)']['threshold']
+    del metrics['patients_metrics (>= 4 IH slice)']['threshold']
+    del metrics['patients_metrics (>= 5 IH slice)']['threshold']
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
         yaml.dump(metrics, fp)

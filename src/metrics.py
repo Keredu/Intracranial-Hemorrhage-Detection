@@ -43,7 +43,7 @@ def pr_auc(ground_truth, inferences, experiment_dir):
 
 def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
     y_pred = inferences > threshold
-    accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred).item()
+    #accuracy = accuracy_score(y_true=ground_truth, y_pred=y_pred).item()
     #recall = recall_score(y_true=ground_truth, y_pred=y_pred).item()
     #precision = precision_score(y_true=ground_truth, y_pred=y_pred).item()
 
@@ -56,10 +56,12 @@ def calc_metrics(ground_truth, inferences, normalize=None, threshold=0.5):
     tnr = tn / (tn + fp)
     ppv = tp / (tp + fp)
     npv = tn / (tn + fn)
+    acc = (tp+tn) / (tp+tn+fp+fn)
 
     metrics = {'threshold': threshold,
                'TPR': tpr,
                'TNR': tnr,
                'PPV': ppv,
-               'NPV': npv}
+               'NPV': npv,
+               'ACC': acc}
     return {k: round(v, 3) for k,v in metrics.items()}

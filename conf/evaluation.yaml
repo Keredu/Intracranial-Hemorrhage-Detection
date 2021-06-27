@@ -1,7 +1,7 @@
 # Experiment config
 task: evaluation
 experiments_dir: ./experiments
-experiment_code: R34_001
+experiment_code: EFFDET_003
 metrics: False
 grad_cam: True
 
@@ -10,12 +10,12 @@ data:
   name: IHDataset
   path: ../data/windowed/
   classes: [noIH, IH]
-  num_workers: 4
-  batch_size: 10
+  num_workers: 8
+  batch_size: 8
 
 # Initialize model
 model:
-  name: resnet34
+  name: efficientdet_d0
   feature_extract: False #False, finetune the whole model. True, only update new layer params
   use_pretrained: True
   print_model: False
