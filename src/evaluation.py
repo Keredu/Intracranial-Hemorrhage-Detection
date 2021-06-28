@@ -64,7 +64,8 @@ def evaluate(conf):
     patients_bar = tqdm(test_patients.items(),
                         desc='Patient', unit='patients', leave=True)
 
-    inferences = {1: [], 2:[], 3: [], 4: [], 5: []}
+    inferences = {1: [], 2:[], 3: [], 4: [], 5: [],
+                 '5%':[], '7.5%': [], '10%': []}
     ground_truth = []
     for patient, patient_data in patients_bar:
         patient_IH = patient_data['IH'] # If the patient has IH or not
@@ -85,7 +86,13 @@ def evaluate(conf):
         for num_IH_threshold in [1,2,3,4,5]:
             net_IH_prediction = slices_with_IH >= num_IH_threshold
             inferences[num_IH_threshold].append(net_IH_prediction)
+        for percentage, key in [(0.05, '5%'), (0.075, '7.5%'), (0.10, '10%')]:
+            num_IH_threshold = max(1, round(percentage * len(slices)))
+            net_IH_prediction = slices_with_IH >= num_IH_threshold
+            inferences[key].append(net_IH_prediction)
+
         ground_truth.append(patient_IH)
+
 
     ground_truth = np.array(ground_truth).astype(float)
     inferences1 = np.array(inferences[1]).astype(float)
@@ -93,6 +100,9 @@ def evaluate(conf):
     inferences3 = np.array(inferences[3]).astype(float)
     inferences4 = np.array(inferences[4]).astype(float)
     inferences5 = np.array(inferences[5]).astype(float)
+    inferencesperc1 = np.array(inferences['5%']).astype(float)
+    inferencesperc2 = np.array(inferences['7.5%']).astype(float)
+    inferencesperc3 = np.array(inferences['10%']).astype(float)
     metrics['patients_metrics (>= 1 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
                                                     inferences=inferences1)
@@ -108,12 +118,24 @@ def evaluate(conf):
     metrics['patients_metrics (>= 5 IH slice)'] = calc_metrics(
                                                     ground_truth=ground_truth,
                                                     inferences=inferences5)
+    metrics['patients_metrics (>= 5% IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferencesperc1)
+    metrics['patients_metrics (>= 7.5% IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferencesperc2)
+    metrics['patients_metrics (>= 10% IH slice)'] = calc_metrics(
+                                                    ground_truth=ground_truth,
+                                                    inferences=inferencesperc3)
 
     del metrics['patients_metrics (>= 1 IH slice)']['threshold']
     del metrics['patients_metrics (>= 2 IH slice)']['threshold']
     del metrics['patients_metrics (>= 3 IH slice)']['threshold']
     del metrics['patients_metrics (>= 4 IH slice)']['threshold']
     del metrics['patients_metrics (>= 5 IH slice)']['threshold']
+    del metrics['patients_metrics (>= 5% IH slice)']['threshold']
+    del metrics['patients_metrics (>= 7.5% IH slice)']['threshold']
+    del metrics['patients_metrics (>= 10% IH slice)']['threshold']
 
     with open(os.path.join(experiment_dir, 'metrics.yaml'), 'w') as fp:
         yaml.dump(metrics, fp)
