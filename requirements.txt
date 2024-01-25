@@ -11,3 +11,4 @@ torchaudio
 torchmetrics
 torchvision
 tqdm
+grad-cam==1.3.6
